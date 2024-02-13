@@ -1,0 +1,56 @@
+function sendDailyEmail() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Annual Targets');
+
+//we use here the "raw" variable to get the values of the cells in google sheets to freely manipulate the number like making it a percentage, rounding up, down etc.
+    // Get raw values from the spreadsheet
+  var sales_raw = sheet.getRange('C27').getValue(); //the value of the cell C27
+  var orders_raw = sheet.getRange('C12').getValue(); 
+
+
+  var sales_target = sheet.getRange('C24').getValue(); //actual company target
+  var orders_target = sheet.getRange('C9').getValue();
+  var quotations_target = sheet.getRange('C2').getValue();
+
+  // Convert raw values to percentages with two decimal places, here we are manipulating the raw values of the cells 
+  var sales_percentage = (sales_raw * 100).toFixed(2); //converting the cell which contain the sales value to percentage with 2 decimal places
+  var orders_percentage = (orders_raw * 100).toFixed(2);
+
+  // Achieved Number
+  var sales_achieved = sheet.getRange('C26').getValue(); //here we are taking the achieved value of our target in cell C26
+  var orders_achieved = sheet.getRange('C11').getValue();
+  
+  // here we are doing a Remaining Days Countdown in the month to calculate how many days left in the month for our target to be achieved
+  // Calculate the remaining days in the month
+  var today = new Date();
+  var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  var remainingDays = Math.ceil((lastDayOfMonth - today) / (1000 * 60 * 60 * 24));
+
+  //here we write the email subject and body 
+  var subject = 'Our Target Updates!';
+  //in the body part of the email we use HTML elements to customize and style the email body sent, you can skip customizing the email and just use the variable "body" as a string that you add on it
+  var body = '<p style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">';
+  body += '<strong>Our Progress in targets till today!:</strong><br><br>';
+  body += '<span style="color: #000;"><strong>Sales Progress Achieved:</strong> ' + sales_percentage + '%</span>';
+  body += '<br><span style="color: #000;">Sales Target: ' + sales_target + '</span>';
+  body += '<br><span style="color: #000;">Sales Achieved: ' + sales_achieved + '</span><br><br>';
+  body += '<span style="color: #000;"><strong>Orders Progress Achieved:</strong> ' + orders_percentage + '%</span>';
+  body += '<br><span style="color: #000;">Orders Target: ' + orders_target + '</span>';
+  body += '<br><span style="color: #000;">Orders Achieved: ' + orders_achieved + '</span>';
+  body += '<strong>Remaining days to achieve our targets: ' + remainingDays + ' days</strong><br><br>';
+  body += 'Great job everyone, wonderful efforts :). Keep up the excellent work and let\'s aim for even higher achievements today.';
+  body += '<br><br>Best regards,<br>';
+  body += '</p>';
+
+  //here we make an array of strings that contains the email addresses that the mail wil be sent to
+  var recipients = ['example1@gmail.com', 'example2@gmail.com', 'example3@outlook.com'];
+
+  // Convert the array to a string of email addresses separated by commas
+  var recipientString = recipients.join(', ');
+
+  // Send the email
+  MailApp.sendEmail({
+    to: recipientString,
+    subject: subject,
+    htmlBody: body
+  });
+}
